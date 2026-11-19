@@ -26,7 +26,7 @@ def clean_html(value: str | None) -> str | None:
 
 
 def is_generic_summary(value: str | None) -> bool:
-    """Identify common low-quality RSS summaries."""
+    """Identify low-quality RSS summaries."""
 
     if not value:
         return True
@@ -38,7 +38,10 @@ def is_generic_summary(value: str | None) -> bool:
         "the post",
     ]
 
-    return any(pattern in text for pattern in generic_patterns)
+    return any(
+        pattern in text
+        for pattern in generic_patterns
+    )
 
 
 def extract_rss_content(entry: Any) -> str | None:

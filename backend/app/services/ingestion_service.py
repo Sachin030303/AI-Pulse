@@ -9,12 +9,16 @@ from sqlalchemy import select
 from app.db.session import SessionLocal
 from app.models import NewsSource, Article
 from app.ingestion.rss_collector import collect_rss_feed
+from app.ingestion.content_extractor import extract_article_content
 
 
-def generate_content_hash(title: str, summary: str | None) -> str:
+def generate_content_hash(
+    title: str,
+    article_text: str | None,
+) -> str:
     """Generate a SHA-256 hash for article content."""
 
-    content = f"{title.strip()} {summary or ''}".strip().lower()
+    content = f"{title.strip()} {article_text or ''}".strip().lower()
 
     return hashlib.sha256(
         content.encode("utf-8")
@@ -22,7 +26,7 @@ def generate_content_hash(title: str, summary: str | None) -> str:
 
 
 def ingest_rss_source(source_id: int) -> dict:
-    """Fetch RSS articles and efficiently save only new articles."""
+    """Fetch RSS articles and save new articles with available content."""
 
     db = SessionLocal()
 
@@ -41,14 +45,12 @@ def ingest_rss_source(source_id: int) -> dict:
 
         fetched_articles = collect_rss_feed(source.url)
 
-        # Collect unique URLs from the incoming feed.
         incoming_urls = {
             item["url"]
             for item in fetched_articles
             if item.get("url")
         }
 
-        # Fetch all existing URLs in one database query.
         existing_urls = set()
 
         if incoming_urls:
@@ -63,33 +65,61 @@ def ingest_rss_source(source_id: int) -> dict:
         inserted_articles = []
         seen_urls = set()
 
+        extraction_successful = 0
+        extraction_failed = 0
+        extraction_not_needed = 0
+
         for item in fetched_articles:
             url = item.get("url")
 
             if not url:
                 continue
 
-            # Skip URLs already in the database or this feed batch.
             if url in existing_urls or url in seen_urls:
                 continue
 
             seen_urls.add(url)
 
+            title = item["title"]
+            summary = item.get("summary")
+            content = item.get("content")
+
+            # Use webpage extraction when RSS has no full content.
+            if not content:
+                try:
+                    extracted = extract_article_content(url)
+
+                    content = extracted.get("content")
+
+                    if content:
+                        extraction_successful += 1
+                    else:
+                        extraction_failed += 1
+
+                except Exception as error:
+                    extraction_failed += 1
+                    print(
+                        f"Content extraction failed for {url}: {error}"
+                    )
+
+            else:
+                extraction_not_needed += 1
+
             article = Article(
                 source_id=source.id,
-                title=item["title"],
+                title=title,
                 url=url,
-                summary=item.get("summary"),
+                summary=summary,
+                content=content,
                 content_hash=generate_content_hash(
-                    item["title"],
-                    item.get("summary"),
+                    title,
+                    content or summary,
                 ),
                 published_at=item.get("published_at"),
             )
 
             inserted_articles.append(article)
 
-        # Add all new articles together.
         if inserted_articles:
             db.add_all(inserted_articles)
 
@@ -105,6 +135,9 @@ def ingest_rss_source(source_id: int) -> dict:
             "fetched": len(fetched_articles),
             "inserted": inserted,
             "skipped": skipped,
+            "extraction_successful": extraction_successful,
+            "extraction_failed": extraction_failed,
+            "extraction_not_needed": extraction_not_needed,
         }
 
     except Exception:
@@ -113,6 +146,8 @@ def ingest_rss_source(source_id: int) -> dict:
 
     finally:
         db.close()
+
+
 def ingest_all_rss_sources() -> dict:
     """Ingest articles from every active RSS source."""
 
@@ -126,7 +161,6 @@ def ingest_all_rss_sources() -> dict:
             )
         ).all()
 
-        # Extract IDs before closing the database session.
         source_ids = [source.id for source in sources]
 
     finally:
