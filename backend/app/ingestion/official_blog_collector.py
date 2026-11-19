@@ -1,0 +1,1 @@
+"""Official blog collector placeholder."""

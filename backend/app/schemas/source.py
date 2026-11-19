@@ -1,0 +1,1 @@
+"""News source schemas placeholder."""

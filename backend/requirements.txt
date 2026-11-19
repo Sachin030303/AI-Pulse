@@ -1,0 +1,33 @@
+# Add backend runtime and development dependencies here.
+
+# API framework
+fastapi
+uvicorn[standard]
+
+# Configuration and validation
+pydantic
+pydantic-settings
+python-dotenv
+
+# Database
+sqlalchemy
+psycopg[binary]
+pgvector
+alembic
+
+# HTTP and RSS ingestion
+httpx
+feedparser
+beautifulsoup4
+
+# Scheduling
+apscheduler
+
+# Utilities
+python-multipart
+email-validator
+
+# Testing
+pytest
+pytest-asyncio
+httpx

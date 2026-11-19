@@ -1,0 +1,1 @@
+"""Administrator creation script placeholder."""

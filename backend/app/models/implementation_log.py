@@ -1,0 +1,1 @@
+"""Implementation log model placeholder."""
