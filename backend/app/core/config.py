@@ -1,4 +1,3 @@
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,6 +8,11 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     DATABASE_URL: str
+
+    # Ollama configuration
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "qwen2.5:3b"
+    OLLAMA_TIMEOUT: int = 300
 
     model_config = SettingsConfigDict(
         env_file=".env",

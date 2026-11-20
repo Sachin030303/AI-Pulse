@@ -1,6 +1,6 @@
-
-from fastapi import FastAPI
-
+﻿from fastapi import FastAPI
+from app.api.v1 import news, sources, ingestion, knowledge, skills
+from app.api.v1 import news, sources, ingestion, knowledge
 from app.core.config import settings
 
 
@@ -27,3 +27,28 @@ async def health_check():
         "status": "healthy",
         "application": settings.APP_NAME,
     }
+
+
+app.include_router(
+    news.router,
+    prefix=settings.API_V1_PREFIX,
+)
+
+app.include_router(
+    sources.router,
+    prefix=settings.API_V1_PREFIX,
+)
+
+app.include_router(
+    ingestion.router,
+    prefix=settings.API_V1_PREFIX,
+)
+
+app.include_router(
+    knowledge.router,
+    prefix=settings.API_V1_PREFIX,
+)
+app.include_router(
+    skills.router,
+    prefix=settings.API_V1_PREFIX,
+)
