@@ -1,6 +1,14 @@
 ﻿from fastapi import FastAPI
-from app.api.v1 import news, sources, ingestion, knowledge, skills
-from app.api.v1 import news, sources, ingestion, knowledge
+
+from app.api.v1 import (
+    news,
+    sources,
+    ingestion,
+    knowledge,
+    skills,
+    projects,
+)
+
 from app.core.config import settings
 
 
@@ -48,7 +56,13 @@ app.include_router(
     knowledge.router,
     prefix=settings.API_V1_PREFIX,
 )
+
 app.include_router(
     skills.router,
+    prefix=settings.API_V1_PREFIX,
+)
+
+app.include_router(
+    projects.router,
     prefix=settings.API_V1_PREFIX,
 )
