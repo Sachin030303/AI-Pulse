@@ -8,3 +8,5 @@ __pycache__/
 *.db
 coverage.xml
 htmlcov/
+
+.auth_jwt_secret

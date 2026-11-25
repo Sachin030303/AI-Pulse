@@ -1,8 +1,8 @@
-import re
+﻿import re
 from sqlalchemy import select, func
 from app.db.session import SessionLocal
 from app.models import Article
-from app.llm.ollama_client import generate_response
+from app.llm.gemini_client import generate_response
 
 
 SYSTEM_PROMPT = """
@@ -43,7 +43,7 @@ def clean_summary_output(summary: str) -> str:
 
         r"^this news summary discusses\s*:\s*",
 
-        r"^here['’]s a news summary of the article"
+        r"^here['â€™]s a news summary of the article"
         r".*?:\s*",
 
         r"^the following is a summary\s*:\s*",
@@ -61,7 +61,7 @@ def clean_summary_output(summary: str) -> str:
     summary = re.sub(r"(?m)^\s*[-*_]{3,}\s*$", "", summary)
 
     # Remove bullet markers, including inline bullets
-    summary = re.sub(r"(?m)(^|\s)[-*•]\s+", r"\1", summary)
+    summary = re.sub(r"(?m)(^|\s)[-*â€¢]\s+", r"\1", summary)
 
     # Remove numbered list markers, including inline numbering
     summary = re.sub(r"(?m)(^|\s)\d+[.)]\s+", r"\1", summary)

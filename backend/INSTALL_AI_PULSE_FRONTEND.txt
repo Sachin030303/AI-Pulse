@@ -1,0 +1,31 @@
+AI-PULSE FRONTEND INSTALLATION (WINDOWS / POWERSHELL)
+
+1) Save ai-pulse-frontend.zip to your Downloads folder.
+
+2) From PowerShell:
+   cd D:\AI-Pulse\backend
+   Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\ai-pulse-frontend.zip" -DestinationPath "D:\AI-Pulse\backend" -ErrorAction Stop
+
+3) Install the admin-protected saved-briefing reader:
+   python -m scripts.install_saved_briefing_api --check
+   python -m scripts.install_saved_briefing_api --install
+   python -m compileall -q app
+   python -m scripts.verify_frontend_contract
+
+4) Start FastAPI in the first PowerShell window:
+   cd D:\AI-Pulse\backend
+   python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+5) Start the frontend in a second PowerShell window:
+   cd D:\AI-Pulse\backend\frontend
+   npm install
+   npm run build
+   npm run dev
+
+6) Open http://127.0.0.1:5173 and log in using your existing AI-Pulse administrator account.
+
+No database migrations or schema changes required.
+Only React frontend files and one admin-protected read-only API route are added.
+The Windows scheduled task was already enabled in the user's setup.
+
+Safety: do not upload .env, JWTs, or database exports. Do not deploy publicly without further hardening.

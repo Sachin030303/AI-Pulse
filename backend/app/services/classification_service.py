@@ -1,4 +1,4 @@
-
+﻿
 """AI-powered article classification service."""
 
 import re
@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from app.db.session import SessionLocal
 from app.models import Article
-from app.llm.ollama_client import generate_response
+from app.llm.gemini_client import generate_response
 
 
 # Category IDs are mapped directly to their database values.
@@ -278,3 +278,4 @@ def classify_missing_articles(
 
     finally:
         db.close()
+

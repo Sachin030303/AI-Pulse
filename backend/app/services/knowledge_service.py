@@ -1,10 +1,10 @@
-"""Knowledge service placeholder."""
+﻿"""Knowledge service placeholder."""
 """Knowledge retrieval and question-answering service."""
 
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.llm.ollama_client import generate_response
+from app.llm.gemini_client import generate_response
 from app.repositories.knowledge_repository import (
     search_articles,
     get_topics,
@@ -170,7 +170,8 @@ def ask_knowledge(
     return KnowledgeAskResponse(
         question=question,
         answer=answer,
-        model=settings.OLLAMA_MODEL,
+        model=settings.GEMINI_MODEL,
         sources_used=len(sources),
         sources=sources,
     )
+
