@@ -1,8 +1,3 @@
-# Backend container definition placeholder.
-
-cd D:\AI-Pulse\backend
-
-@'
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -19,8 +14,3 @@ COPY . .
 EXPOSE 10000
 
 CMD ["sh", "-c", "exec python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
-'@ | Set-Content Dockerfile -Encoding ASCII
-
-Write-Host "PASS: Dockerfile created"
-
-Get-Content Dockerfile
